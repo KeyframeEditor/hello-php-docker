@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  php:
+    image: php:8.3-fpm
+    volumes:
+      - .:/var/www/html
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - php
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
