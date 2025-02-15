@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   php:
-    image: php:8.1-fpm
+    build: .
     volumes:
       - .:/var/www/html
     networks:
@@ -18,6 +18,22 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - php
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  mysql: # Add this MySQL service
+    image: mysql:latest  # Or a specific version
+    environment:
+      MYSQL_ROOT_PASSWORD: your_root_password # Replace with a strong password
+      MYSQL_DATABASE: your_database # Replace with your database name
+      MYSQL_USER: your_username # Replace with your username
+      MYSQL_PASSWORD: your_password # Replace with your password
+    ports:
+      - "3306:3306" # Optional: map the MySQL port to your host
+    command: --init-file=/docker-entrypoint-initdb.d/schema.sql
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
     networks:
       - app-network
     restart: unless-stopped
